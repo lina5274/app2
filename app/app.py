@@ -2,6 +2,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256
+import re
 
 
 # Создаем экземпляр Flask приложения
@@ -37,10 +38,9 @@ with app.app_context():
 # Маршрут для регистрации нового пользователя
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-    email = data['email']
+    username = request.form['username']
+    password = request.form['password']
+    email = request.form['email']
 
     # Валидация данных
     if not re.match(r'^[a-zA-Z0-9]{3,}$', username):
@@ -70,9 +70,8 @@ def register():
 # Маршрут для аутентификации пользователя
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
+    username = request.form['username']
+    password = request.form['password']
 
     # Проверяем, существует ли пользователь и корректны ли у него данные
     user = User.query.filter_by(username=username).first()
@@ -91,9 +90,8 @@ def get_users():
 # Маршрут для добавления нового пользователя
 @app.route('/users', methods=['POST'])
 def add_user():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
+    username = request.form['username']
+    password = request.form['password']
 
     # Проверяем, существует ли уже такой пользователь
     if User.query.filter_by(username=username).first():
